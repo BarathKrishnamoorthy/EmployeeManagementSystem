@@ -1,0 +1,23 @@
+<h1>{{viewTitle}}</h1>
+<!--<a href="/employee/activity" class="btn btn-info btn-sm">General Setting</a>
+-->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>EmailID</th>
+            <th>Action</th>
+            <th>Date Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each logs}}
+        <tr>
+            <td>{{this.name}}</td>
+            <td>{{this.email}}</td>
+            <td>{{this.action}}</td>
+            <td>{{this.timestamp}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>

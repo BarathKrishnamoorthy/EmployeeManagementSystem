@@ -1,0 +1,124 @@
+<div class="container" style="padding: 0;">
+    <h3 class="mb-4">
+        <a class="btn btn-custom" href="/employee/addOrEdit"><i class="fa fa-plus"></i> Create New</a>
+        Employee List
+    </h3>
+
+    <!-- Filter and Search Form -->
+    <div class="mb-4">
+        <form action="/employee/list" method="GET" class="form-inline mb-3" onsubmit="return validateForm()">
+            <div class="form-group mr-2">
+                <input type="text" class="form-control" id="searchQuery" name="search"
+                    placeholder="Search by name or email or mobileNO" value="{{search}}">
+            </div>
+            <br>
+            <div class="form-group mr-3">
+                <label for="fromDate" class="mr-2">From:</label>
+                <input type="date" class="form-control" id="fromDate" name="fromDate" value="{{fromDate}}">
+            </div>
+            <div class="form-group mr-2">
+                <label for="toDate" class="mr-2">To:</label>
+                <input type="date" class="form-control" id="toDate" name="toDate" value="{{toDate}}">
+            </div>
+            <div class="form-group mr-2">
+                <label for="statusFilter" class="mr-2">Status:</label>
+                <select id="statusFilter" name="status" class="form-control">
+                    <option value="">All</option>
+                    <option id="activeAccount" value="active" {{#if (eq selectedStatus 'active' )}}selected{{/if}}>
+                        Active</option>
+                    <option id="inactiveAccount" value="inactive" {{#if (eq selectedStatus 'inactive'
+                        )}}selected{{/if}}>Inactive</option>
+                </select>
+            </div>
+            <button type="button" class="btn btn-secondary mr-2" onclick="clearFilters()">Clear</button>
+            <button type="submit" class="btn btn-custom">Filter</button>
+
+            <div id="filterError" class="alert alert-danger mt-2" style="display:none;"></div>
+        </form>
+    </div>
+
+    <div class="employee-counts mb-4">
+        <p>Active Employees: <strong>{{activeCount}}</strong></p>
+        <p>Inactive Employees: <strong>{{inactiveCount}}</strong></p>
+    </div>
+
+    <div style="overflow-x: auto;">
+        {{#if docs.length}}
+        <table class="table table-striped" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each docs}}
+                <tr>
+                    <td>{{this.fullName}}</td>
+                    <td>{{this.email}}</td>
+                    <td>{{this.mobile}}</td>
+                    <td>{{this.status}}</td>
+                    <td>
+                        <a href="/employee/edit/{{this._id}}" class="btn btn-primary">Edit</a>
+                        <a href="/employee/delete/{{this._id}}" class="btn btn-danger"
+                            onclick="return confirm('Are you sure to delete this record?');">Delete</a>
+                        <a href="/employee/view/{{this.email}}" class="btn btn-info">View</a>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{else}}
+        <p>No employee data available.</p>
+        {{/if}}
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination mt-4">
+        {{#if (gt page 1)}}
+        <a href="/employee/list?page={{subtract page 1}}&fromDate={{fromDate}}&toDate={{toDate}}&status={{selectedStatus}}&search={{search}}"
+            class="btn btn-secondary">Previous</a>
+        {{/if}}
+        {{#if (lt page totalPages)}}
+        <a href="/employee/list?page={{add page 1}}&fromDate={{fromDate}}&toDate={{toDate}}&status={{selectedStatus}}&search={{search}}"
+            class="btn btn-secondary">Next</a>
+        {{/if}}
+    </div>
+
+    <!-- Logout button -->
+    <div class="mt-4">
+        <a href="/employee/logout" class="btn btn-warning">Logout</a>
+    </div>
+</div>
+
+<script>
+    function validateForm() {
+        var fromDate = document.getElementById('fromDate').value;
+        var toDate = document.getElementById('toDate').value;
+        var statusFilter = document.getElementById('statusFilter').value;
+        var searchQuery = document.getElementById('searchQuery').value;
+        var errorDiv = document.getElementById('filterError');
+
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+        if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
+            errorDiv.textContent = 'From date must be before or equal to To date.';
+            errorDiv.style.display = 'block';
+            return false;
+        }
+        if (!statusFilter && !fromDate && !toDate && !searchQuery) {
+            errorDiv.textContent = 'Please enter a search term or select at least one filter.';
+            errorDiv.style.display = 'block';
+            return false;
+        }
+
+        return true;
+    }
+
+    function clearFilters() {
+        window.location.href = '/employee/list';
+    }
+</script>
